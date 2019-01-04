@@ -103,7 +103,6 @@ class _RegisterFormState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         key: _scaffoldKey,
-        resizeToAvoidBottomPadding: true,
         appBar: AppBar(
           title: Text("Smart Farm User registeration"),
         ),

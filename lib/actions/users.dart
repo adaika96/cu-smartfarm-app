@@ -1,3 +1,5 @@
+import '../model/device_info.dart';
+import 'dart:convert';
 class LoginPendingAction {
   final String username;
   final String password;
@@ -20,10 +22,25 @@ class LoginFailureAction {
   LoginFailureAction(this.errmsg);
 }
 
-class QueryDeviceAction {}
+class QueryDevicePendingAction {}
 
-class ReceivedDeviceAction {
-  final List<String> devices;
+class QueryDeviceSuccessAction {
+  final List<DeviceShortInfo> devices;
 
-  ReceivedDeviceAction(this.devices);
+  QueryDeviceSuccessAction({this.devices});
+
+  factory QueryDeviceSuccessAction.From(List<dynamic> deviceResponse) {
+    List<DeviceShortInfo> devices = [];
+    for (var devInfo in deviceResponse) {
+      Map<String, dynamic> mappedDevInfo = jsonDecode(jsonEncode(devInfo));
+      devices.add(DeviceShortInfo(id: mappedDevInfo["deviceID"], name: mappedDevInfo["name"]));
+    }
+    return QueryDeviceSuccessAction(devices: devices);
+  }
+}
+
+class QueryDeviceFailureAction {
+  final String errmsg;
+
+  QueryDeviceFailureAction(this.errmsg);
 }

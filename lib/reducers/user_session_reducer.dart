@@ -17,5 +17,5 @@ UserSession _loginPendingState(UserSession state, LoginPendingAction action) {
 }
 
 UserSession _loginFailureState(UserSession state, LoginFailureAction action) {
-  return UserSession(loginStatus: "failure");
+  return UserSession(loginStatus: "failure", errmsg: action.errmsg);
 }

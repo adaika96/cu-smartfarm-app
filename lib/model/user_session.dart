@@ -1,7 +1,3 @@
-// Copyright 2018 The Flutter Architecture Sample Authors. All rights reserved.
-// Use of this source code is governed by the MIT license that can be found
-// in the LICENSE file.
-
 import 'package:meta/meta.dart';
 
 @immutable
@@ -9,18 +5,21 @@ class UserSession {
   final String httpToken;
   final String username;
   final String loginStatus;
+  final String errmsg;
 
   const UserSession({
     this.httpToken = "",
     this.username = "",
-    this.loginStatus = ""
+    this.loginStatus = "",
+    this.errmsg = ""
   });
 
   @override
   int get hashCode =>
       httpToken.hashCode ^
       loginStatus.hashCode ^
-      username.hashCode;
+      username.hashCode ^
+      errmsg.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -29,10 +28,17 @@ class UserSession {
           runtimeType == other.runtimeType &&
           httpToken == other.httpToken &&
           loginStatus == other.loginStatus &&
-          username == other.username;
+          username == other.username &&
+          errmsg == other.errmsg;
 
   @override
   String toString() {
-    return 'UserSession{username: $username, loginStatus: $loginStatus}';
+    return """UserSession{
+      username: $username,
+      loginStatus: $loginStatus,
+      token: $httpToken,
+      errmsg: $errmsg
+    }
+    """;
   }
 }

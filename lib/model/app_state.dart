@@ -1,29 +1,27 @@
-// Copyright 2018 The Flutter Architecture Sample Authors. All rights reserved.
-// Use of this source code is governed by the MIT license that can be found
-// in the LICENSE file.
-
 import 'package:meta/meta.dart';
+
 import './user_session.dart';
+import './device_info.dart';
 
 @immutable
 class AppState {
   final UserSession userSession;
   final String wsToken;
   final String errmsg;
-  final List<String> devices;
+  final OwnedDevice devices;
 
   AppState({
     this.userSession = const UserSession(),
     this.wsToken = "",
     this.errmsg = "",
-    this.devices = const []
+    this.devices = const OwnedDevice(),
   });
 
   AppState copyWith({
     UserSession userSession,
     String wsToken,
-    List<String> devices,
-    String errmsg
+    String errmsg,
+    OwnedDevice devices
   }) {
     return AppState(
       userSession: userSession ?? this.userSession,

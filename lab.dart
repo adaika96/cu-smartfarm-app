@@ -45,7 +45,12 @@ void main() {
   counterBloc.state.listen((data) {
     print(data);
   });
-
+  dynamic al;
+  try {
+    print(al.sd);
+  } catch (e) {
+    print("error".toString());
+  }
   counterBloc.dispatch(Increment());
   counterBloc.dispatch(Increment());
   counterBloc.dispatch(Increment());
