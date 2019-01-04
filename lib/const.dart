@@ -1,6 +1,21 @@
 library cu_smartfarm_app.constant;
 
-const ServerIP = "192.168.43.21:3000";
+String escapeOverflowText(String text) {
+    String escapedOverflowText = "";
+    String line = "";
+    for (var chunk in text.split(" ")) {
+      if ((line + chunk).length < 40) {
+        line += " " + chunk;
+      } else {
+        escapedOverflowText += line + "\n";
+        line = "";
+      }
+    }
+    escapedOverflowText += line;
+    return escapedOverflowText;
+  }
+// const ServerIP = "192.168.43.21:3000";
+const ServerIP = "10.0.2.2:3000";
 const AvailableProvince = [
   "กระบี่",
   "กรุงเทพมหานคร",

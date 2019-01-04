@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 
+
 class LoginForm extends StatefulWidget {
-  LoginForm({Key key}) : super(key: key); // Constructor
+  final Function(String, String) onLogin;
+  LoginForm({Key key, this.onLogin}) : super(key: key); // Constructor
 
   @override
-  _LoginFormState createState() => _LoginFormState();
+  _LoginFormState createState() => _LoginFormState(onLogin: onLogin);
 }
 
 class _LoginFormState extends State<LoginForm> {
+  final Function(String, String) onLogin;
   TextEditingController username = TextEditingController(),
       password = TextEditingController();
+
   void onClickDummy() {
-    print(username.text);
-    print(password.text);
+    onLogin(username.text, password.text);
   }
+
+  _LoginFormState({this.onLogin});
 
   @override
   Widget build(BuildContext context) {

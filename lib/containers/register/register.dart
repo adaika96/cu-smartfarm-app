@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../const.dart' as constants;
-import '../api/httpAPI.dart' as httpapi;
+import '../../const.dart' as constants;
+import '../../api/httpAPI.dart' as httpapi;
 import 'dart:convert';
 
 class RegisterPage extends StatefulWidget {
@@ -34,22 +34,6 @@ class _RegisterFormState extends State<RegisterPage> {
     return null;
   }
 
-  String escapeOverflowText(String text) {
-    String escapedOverflowText = "";
-    String line = "";
-    for (var chunk in text.split(" ")) {
-      print(chunk);
-      if ((line + chunk).length < 40) {
-        line += " " + chunk;
-      } else {
-        escapedOverflowText += line + "\n";
-        line = "";
-      }
-    }
-    escapedOverflowText += line;
-    return escapedOverflowText;
-  }
-
   void onClickRegister() {
     if (_formKey.currentState.validate()) {
       if (province != null) {
@@ -62,7 +46,7 @@ class _RegisterFormState extends State<RegisterPage> {
             ],
           ),
         ));
-        httpapi.Registration({
+        httpapi.RegistrationAPI({
           "username": username.text,
           "password": password.text,
           "province": province,
@@ -71,7 +55,7 @@ class _RegisterFormState extends State<RegisterPage> {
           "email": email.text,
         }).then((response) {
           Map<String, dynamic> result = jsonDecode(response.body);
-          if (response.statusCode == 200 && result['status'] == "OK") {
+          if (response.statusCode == 200 && result['success'] as bool == true) {
             _scaffoldKey.currentState.hideCurrentSnackBar();
             Navigator.pop(context, <Widget>[
               new Icon(
@@ -80,6 +64,8 @@ class _RegisterFormState extends State<RegisterPage> {
               ),
               new Text("  Registration success.")
             ]);
+          }else{
+            throw(result['message']);
           }
         }).catchError((error) {
           _scaffoldKey.currentState.hideCurrentSnackBar();
@@ -91,7 +77,7 @@ class _RegisterFormState extends State<RegisterPage> {
                   color: Colors.red,
                 ),
                 new Text(
-                  escapeOverflowText(error.toString()),
+                  constants.escapeOverflowText(error.toString()),
                 )
               ],
             ),
