@@ -1,13 +1,14 @@
 import '../model/device_info.dart';
 import 'dart:convert';
+
+class CheckIsTokenExpired {}
+
 class LoginPendingAction {
   final String username;
   final String password;
 
   LoginPendingAction(this.username, this.password);
 }
-
-// class LoginPendingAction{}
 
 class LoginSuccessAction {
   final String token;
@@ -44,3 +45,12 @@ class QueryDeviceFailureAction {
 
   QueryDeviceFailureAction(this.errmsg);
 }
+
+class NewWebSocketConnection {
+  List<String> devices;
+  String token;
+
+  NewWebSocketConnection({this.devices, this.token});
+}
+
+class EnsureSocketConnection {}

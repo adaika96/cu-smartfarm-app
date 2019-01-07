@@ -12,12 +12,14 @@ class _LoginPageViewModel {
   final String errmsg;
   final Function(String, String) onLogin;
   final Function(BuildContext) onLoginSuccess;
+  final Function() onInit;
 
   _LoginPageViewModel({
     @required this.loginStatus,
     @required this.errmsg,
     @required this.onLogin,
     @required this.onLoginSuccess,
+    @required this.onInit,
   });
 
   @override
@@ -40,15 +42,19 @@ class LoginPageContainer extends StatelessWidget {
       converter: (Store<AppState> store) {
         print(store.state.userSession);
         return new _LoginPageViewModel(
-            errmsg: store.state.userSession.errmsg,
-            loginStatus: store.state.userSession.loginStatus,
-            onLogin: (String username, String password) {
-              store.dispatch(LoginPendingAction(username, password));
-            },
-            onLoginSuccess: (BuildContext cContext) {
-              store.dispatch(QueryDevicePendingAction());
-              Navigator.pushReplacementNamed(cContext, "/home");
-            });
+          errmsg: store.state.userSession.errmsg,
+          loginStatus: store.state.userSession.loginStatus,
+          onLogin: (String username, String password) {
+            store.dispatch(LoginPendingAction(username, password));
+          },
+          onLoginSuccess: (BuildContext cContext) {
+            store.dispatch(QueryDevicePendingAction());
+            Navigator.pushReplacementNamed(cContext, "/home");
+          },
+          onInit: (){
+            store.dispatch(CheckIsTokenExpired());
+          }
+        );
       },
       builder: (context, loginViewModel) {
         return LoginPage(
@@ -56,6 +62,7 @@ class LoginPageContainer extends StatelessWidget {
           loginStatus: loginViewModel.loginStatus,
           errmsg: loginViewModel.errmsg,
           onLoginSuccess: loginViewModel.onLoginSuccess,
+          onInit: loginViewModel.onInit,
         );
       },
     );
@@ -67,13 +74,16 @@ class LoginPage extends StatefulWidget {
   final String errmsg;
   final Function handleLogin;
   final Function onLoginSuccess;
+  final Function onInit;
 
   LoginPage(
       {Key key,
       @required this.loginStatus,
       @required this.errmsg,
       @required this.handleLogin,
-      @required this.onLoginSuccess})
+      @required this.onLoginSuccess,
+      @required this.onInit
+      })
       : super(key: key);
 
   @override
@@ -83,7 +93,11 @@ class LoginPage extends StatefulWidget {
 class _LoginPage extends State<LoginPage> {
 
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
+  @override
+    void initState() {
+      widget.onInit();
+      super.initState();
+    }
   @override
   Widget build(BuildContext context) {
     if (widget.loginStatus == "pending") {

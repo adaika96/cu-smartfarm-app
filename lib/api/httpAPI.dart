@@ -20,6 +20,11 @@ Future<http.Response> LoginAPI(Map<String, String> args) {
   return http.post("http://${constants.ServerIP}/api/v1/login", body: args);
 }
 
+Future<http.Response> CheckTokenAPI(String token) {
+  return http.get("http://${constants.ServerIP}/api/v1/user/checkStatus",
+      headers: {"Authorization": "Bearer " + token});
+}
+
 Future<http.Response> GetDeviceAPI(String token) {
   return http.get("http://${constants.ServerIP}/api/v1/user/myDevices",
       headers: {"Authorization": "Bearer " + token});

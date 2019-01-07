@@ -2,30 +2,31 @@ import 'package:meta/meta.dart';
 
 import './user_session.dart';
 import './device_info.dart';
+import './ws.dart';
 
 @immutable
 class AppState {
   final UserSession userSession;
-  final String wsToken;
+  final WebSocketAPIConnection wsAPI;
   final String errmsg;
   final OwnedDevice devices;
 
   AppState({
     this.userSession = const UserSession(),
-    this.wsToken = "",
+    this.wsAPI = null,
     this.errmsg = "",
     this.devices = const OwnedDevice(),
   });
 
   AppState copyWith({
     UserSession userSession,
-    String wsToken,
+    WebSocketAPIConnection wsAPI,
     String errmsg,
     OwnedDevice devices
   }) {
     return AppState(
       userSession: userSession ?? this.userSession,
-      wsToken: wsToken ?? this.wsToken,
+      wsAPI: wsAPI ?? this.wsAPI,
       devices: devices ?? this.devices,
       errmsg: errmsg ?? this.errmsg,
     );
@@ -33,7 +34,7 @@ class AppState {
 
   @override
   int get hashCode =>
-      userSession.hashCode ^ wsToken.hashCode ^ devices.hashCode ^ errmsg.hashCode;
+      userSession.hashCode ^ wsAPI.hashCode ^ devices.hashCode ^ errmsg.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -41,7 +42,7 @@ class AppState {
       other is AppState &&
           runtimeType == other.runtimeType &&
           userSession == other.userSession &&
-          wsToken == other.wsToken &&
+          wsAPI == other.wsAPI &&
           errmsg == other.errmsg &&
           devices == other.devices;
 

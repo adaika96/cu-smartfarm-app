@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../actions/users.dart';
 import '../../model/device_info.dart';
 import '../../model/app_state.dart';
+import '../device/device_control_page.dart';
 import './addDevice/add_device_page.dart';
 import './editDevice/remove_device_dialog.dart';
 import './editDevice/edit_device_dialog.dart';
@@ -13,8 +14,10 @@ class _HomePageViewModel {
   final OwnedDevice deviceList;
   final String currentHTTPtoken;
   final Function onReload;
+  final Function onSetupWS;
 
-  _HomePageViewModel({this.deviceList, this.currentHTTPtoken, this.onReload});
+  _HomePageViewModel(
+      {this.deviceList, this.currentHTTPtoken, this.onReload, this.onSetupWS});
 
   @override
   int get hashCode => deviceList.hashCode ^ currentHTTPtoken.hashCode;
@@ -39,13 +42,18 @@ class HomePageContainer extends StatelessWidget {
             currentHTTPtoken: store.state.userSession.httpToken,
             onReload: () {
               store.dispatch(QueryDevicePendingAction());
+            },
+            onSetupWS: () {
+              store.dispatch(EnsureSocketConnection());
             });
       },
       builder: (context, vm) {
         return HomePage(
-            deviceList: vm.deviceList,
-            token: vm.currentHTTPtoken,
-            reload: vm.onReload);
+          deviceList: vm.deviceList,
+          token: vm.currentHTTPtoken,
+          reload: vm.onReload,
+          setupWS: vm.onSetupWS,
+        );
       },
     );
   }
@@ -55,8 +63,10 @@ class HomePage extends StatefulWidget {
   final OwnedDevice deviceList;
   final String token;
   final Function reload;
+  final Function setupWS;
 
-  HomePage({Key key, this.deviceList, this.token, this.reload}) : super(key: key); // Constructor
+  HomePage({Key key, this.deviceList, this.token, this.reload, this.setupWS})
+      : super(key: key); // Constructor
 
   @override
   _HomePage createState() => new _HomePage();
@@ -64,7 +74,6 @@ class HomePage extends StatefulWidget {
 
 @immutable
 class _HomePage extends State<HomePage> {
-
   GlobalKey<ScaffoldState> _homepageScaffoldKey =
       new GlobalKey<ScaffoldState>();
 
@@ -100,8 +109,11 @@ class _HomePage extends State<HomePage> {
                                         fontWeight: FontWeight.w300)),
                               )
                             : ListTile(
-                                onLongPress:() async {
-                                  if (await editDialog(context, widget.deviceList.devices[index-1], widget.token)){
+                                onLongPress: () async {
+                                  if (await editDialog(
+                                      context,
+                                      widget.deviceList.devices[index - 1],
+                                      widget.token)) {
                                     widget.reload();
                                   }
                                 },
@@ -109,7 +121,10 @@ class _HomePage extends State<HomePage> {
                                   margin: EdgeInsets.only(top: 10),
                                   child: IconButton(
                                     onPressed: () async {
-                                      if(await confirmDeletion(context, widget.deviceList.devices[index-1], widget.token)){
+                                      if (await confirmDeletion(
+                                          context,
+                                          widget.deviceList.devices[index - 1],
+                                          widget.token)) {
                                         widget.reload();
                                       }
                                     },
@@ -117,13 +132,22 @@ class _HomePage extends State<HomePage> {
                                     icon: Icon(Icons.delete),
                                   ),
                                 ),
-                                title: Text(widget.deviceList.devices[index - 1].name),
-                                subtitle: Text(
-                                    "ID: " + widget.deviceList.devices[index - 1].id),
+                                title: Text(
+                                    widget.deviceList.devices[index - 1].name),
+                                subtitle: Text("ID: " +
+                                    widget.deviceList.devices[index - 1].id),
                                 onTap: () {
-                                  print("[Debug] Tapped on \"" +
-                                      widget.deviceList.devices[index - 1].name +
-                                      "\"");
+                                  // print("[Debug] Tapped on \"" +
+                                  //     widget
+                                  //         .deviceList.devices[index - 1].name +
+                                  //     "\"");
+                                  widget.setupWS();
+                                  Navigator.push(context,MaterialPageRoute(
+                                      builder: (context) => DevicePageContainer(
+                                        deviceID: widget.deviceList.devices[index - 1].id,
+                                      ),
+                                    ),
+                                  );
                                 },
                               );
                       },
