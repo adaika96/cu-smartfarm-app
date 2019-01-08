@@ -145,6 +145,7 @@ class _HomePage extends State<HomePage> {
                                   Navigator.push(context,MaterialPageRoute(
                                       builder: (context) => DevicePageContainer(
                                         deviceID: widget.deviceList.devices[index - 1].id,
+                                        deviceName: widget.deviceList.devices[index - 1].name,
                                       ),
                                     ),
                                   );

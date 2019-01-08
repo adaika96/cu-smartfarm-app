@@ -25,7 +25,7 @@ class ErrorMessage {
 
   @override
   String toString() {
-    return 'ErrorMessage{ErrorMessage: $errmsg, Endpoint: $endpoint';
+    return 'ErrorMessage{ErrorMessage: $errmsg, Endpoint: $endpoint}';
   }
 }
 

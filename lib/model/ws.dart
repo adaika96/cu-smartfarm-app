@@ -14,18 +14,18 @@ class WebSocketAPIConnection {
 
   // WebSocketAPIConnection(this._conn, this._wsToken);
 
-  WebSocketAPIConnection(List<String> devices, String token){
+  WebSocketAPIConnection(List<String> devices, String token) {
     statusBlocs = new Map();
     errorReportBloc = new DevicePageAPIResultBLoC();
-    devices.forEach((devname){
+    devices.forEach((devname) {
       statusBlocs[devname] = DevicePageStatusBLoC(devname);
     });
-    this._conn = IOWebSocketChannel.connect('ws://${constants.ServerIP}/subscribe/ws',headers: {
-      "Authorization": "Bearer " + token
-    });
-    this._conn.stream.listen((message){
+    this._conn = IOWebSocketChannel.connect(
+        'ws://${constants.ServerIP}/subscribe/ws',
+        headers: {"Authorization": "Bearer " + token});
+    this._conn.stream.listen((message) {
       var data = jsonDecode(message);
-      if(data["token"] != null){
+      if (data["token"] != null) {
         this._wsToken = data["token"];
       }
       this.statusBlocs.forEach((_, bloc) => bloc.dispatch(data));
@@ -37,47 +37,44 @@ class WebSocketAPIConnection {
   //   return WebSocketAPIConnection(old._conn, token);
   // }
 
-  void pollDevice() {
-    const qMessage = {
+  void pollDevice(String deviceID) {
+    var qMessage = {
       "endPoint": "pollDevice",
+      "token": _wsToken,
+      "payload": {
+        "deviceID": deviceID,
+      }
     };
-    qMessage["token"] = _wsToken;
     _conn.sink.add(jsonEncode(qMessage));
   }
 
   void setDevice(String deviceID, String relayID, Map<String, dynamic> state) {
-    Map<String, dynamic> qMessage = {
+    var qMessage = {
       "endPoint": "setDevice",
-    };
-    qMessage["token"] = _wsToken;
-    qMessage["payload"] = {
-      "deviceID": deviceID,
-      "param": {
-        "relayID": relayID,
-        "state": state
+      "token": _wsToken,
+      "payload": {
+        "deviceID": deviceID,
+        "param": {"relayID": relayID, "state": state}
       }
     };
     _conn.sink.add(jsonEncode(qMessage));
   }
 
   void getLatestState(String deviceID) {
-    Map<String, dynamic> qMessage = {
-      "endPoint": "setDevice",
-    };
-    qMessage["token"] = _wsToken;
-    qMessage["payload"] = {
-      "deviceID": deviceID
+    var qMessage = {
+      "endPoint": "getLatestState",
+      "token": _wsToken,
+      "payload": {"deviceID": deviceID}
     };
     _conn.sink.add(jsonEncode(qMessage));
   }
 
-  void disconnect(){
+  void disconnect() {
     this._conn.sink.close();
   }
 
   @override
-  int get hashCode =>
-      _conn.hashCode ^ _wsToken.hashCode ^ statusBlocs.hashCode;
+  int get hashCode => _conn.hashCode ^ _wsToken.hashCode ^ statusBlocs.hashCode;
 
   @override
   bool operator ==(Object other) =>

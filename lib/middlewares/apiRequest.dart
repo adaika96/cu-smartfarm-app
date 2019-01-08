@@ -15,7 +15,6 @@ Stream<dynamic> CheckIsExistingTokenExpired(
     final tokenFile =
         File('${(await getApplicationDocumentsDirectory()).path}/.token');
     if (await tokenFile.exists()) {
-      print("toke");
       final token = tokenFile.readAsStringSync();
       try {
         final resp = await CheckTokenAPI(token);
@@ -64,7 +63,6 @@ Stream<dynamic> GetDevice(Stream<dynamic> actions, EpicStore<AppState> store) {
 Stream<dynamic> CreateWSConn(Stream<dynamic> actions, EpicStore<AppState> store) {
   return actions.where((action) => action is EnsureSocketConnection).map(
       (action) {
-        print("eiei");
         return NewWebSocketConnection(
           devices: store.state.devices.devices.map((dev) => (dev.id)).toList(),
           token: store.state.userSession.httpToken);
