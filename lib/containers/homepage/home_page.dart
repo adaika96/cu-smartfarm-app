@@ -14,10 +14,10 @@ class _HomePageViewModel {
   final OwnedDevice deviceList;
   final String currentHTTPtoken;
   final Function onReload;
-  final Function onSetupWS;
+  final Function onSetupDevController;
 
   _HomePageViewModel(
-      {this.deviceList, this.currentHTTPtoken, this.onReload, this.onSetupWS});
+      {this.deviceList, this.currentHTTPtoken, this.onReload, this.onSetupDevController});
 
   @override
   int get hashCode => deviceList.hashCode ^ currentHTTPtoken.hashCode;
@@ -43,7 +43,7 @@ class HomePageContainer extends StatelessWidget {
             onReload: () {
               store.dispatch(QueryDevicePendingAction());
             },
-            onSetupWS: () {
+            onSetupDevController: () {
               store.dispatch(EnsureSocketConnection());
             });
       },
@@ -52,7 +52,7 @@ class HomePageContainer extends StatelessWidget {
           deviceList: vm.deviceList,
           token: vm.currentHTTPtoken,
           reload: vm.onReload,
-          setupWS: vm.onSetupWS,
+          setupDevController: vm.onSetupDevController,
         );
       },
     );
@@ -63,9 +63,9 @@ class HomePage extends StatefulWidget {
   final OwnedDevice deviceList;
   final String token;
   final Function reload;
-  final Function setupWS;
+  final Function setupDevController;
 
-  HomePage({Key key, this.deviceList, this.token, this.reload, this.setupWS})
+  HomePage({Key key, this.deviceList, this.token, this.reload, this.setupDevController})
       : super(key: key); // Constructor
 
   @override
@@ -141,7 +141,7 @@ class _HomePage extends State<HomePage> {
                                   //     widget
                                   //         .deviceList.devices[index - 1].name +
                                   //     "\"");
-                                  widget.setupWS();
+                                  widget.setupDevController();
                                   Navigator.push(context,MaterialPageRoute(
                                       builder: (context) => DevicePageContainer(
                                         deviceID: widget.deviceList.devices[index - 1].id,

@@ -1,5 +1,5 @@
 import 'package:bloc/bloc.dart';
-
+import 'dart:convert';
 abstract class CounterEvent {}
 
 class Increment extends CounterEvent {
@@ -46,6 +46,12 @@ void main() {
     print(data);
   });
   dynamic al;
+  List<int> p = List();
+  p.add(1);
+  p.add(1);
+  p.add(1);
+  p[1] = 5;
+  print(p);
   try {
     print(al.sd);
   } catch (e) {

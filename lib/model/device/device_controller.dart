@@ -1,24 +1,28 @@
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:web_socket_channel/io.dart';
 import 'dart:convert';
-// import 'package:web_socket_channel/io.dart';
 
-import '../const.dart' as constants;
-import './bloc/device_page_bloc.dart';
+import '../../const.dart' as constants;
+import '../../actions/device_bloc.dart';
+import './bloc/device_relay_sensor_bloc.dart';
+import './bloc/device_relay_config_bloc.dart';
 
-class WebSocketAPIConnection {
+class DeviceController {
   WebSocketChannel _conn;
   String _wsToken;
-  Map<String, DevicePageStatusBLoC> statusBlocs;
+  Map<String, DeviceRelayAndSensorLiveStatusBLoC> statusBlocs;
+  Map<String, DeviceRelayConfigBLoC> devRelayConfig;
   DevicePageAPIResultBLoC errorReportBloc;
 
   // WebSocketAPIConnection(this._conn, this._wsToken);
 
-  WebSocketAPIConnection(List<String> devices, String token) {
+  DeviceController(List<String> devices, String token) {
     statusBlocs = new Map();
+    devRelayConfig = new Map();
     errorReportBloc = new DevicePageAPIResultBLoC();
     devices.forEach((devname) {
-      statusBlocs[devname] = DevicePageStatusBLoC(devname);
+      statusBlocs[devname] = DeviceRelayAndSensorLiveStatusBLoC(devname);
+      devRelayConfig[devname] = DeviceRelayConfigBLoC(deviceID: devname, httpToken: token);
     });
     this._conn = IOWebSocketChannel.connect(
         'ws://${constants.ServerIP}/subscribe/ws',
@@ -48,16 +52,24 @@ class WebSocketAPIConnection {
     _conn.sink.add(jsonEncode(qMessage));
   }
 
-  void setDevice(String deviceID, String relayID, Map<String, dynamic> state) {
-    var qMessage = {
-      "endPoint": "setDevice",
-      "token": _wsToken,
-      "payload": {
-        "deviceID": deviceID,
-        "param": {"relayID": relayID, "state": state}
-      }
-    };
-    _conn.sink.add(jsonEncode(qMessage));
+  // Wrapper for DeviceRelayConfigBLoC.dispatch(SetDeviceRelaysConfig)
+  void setDevice(String deviceID, int relayIndex, Map<String, dynamic> state) {
+    // var qMessage = {
+    //   "endPoint": "setDevice",
+    //   "token": _wsToken,
+    //   "payload": {
+    //     "deviceID": deviceID,
+    //     "param": {"relayIndex": relayIndex, "state": state}
+    //   }
+    // };
+    // _conn.sink.add(jsonEncode(qMessage));
+    this.devRelayConfig[deviceID].dispatch(
+      SetDeviceRelaysConfig(
+        relayIndex,
+        mode: state["mode"],
+        detail: state["detail"]
+      )
+    );
   }
 
   void getLatestState(String deviceID) {
@@ -79,7 +91,7 @@ class WebSocketAPIConnection {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is WebSocketAPIConnection &&
+      other is DeviceController &&
           runtimeType == other.runtimeType &&
           _conn == other._conn &&
           _wsToken == other._wsToken &&

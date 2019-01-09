@@ -60,10 +60,10 @@ Stream<dynamic> GetDevice(Stream<dynamic> actions, EpicStore<AppState> store) {
           }));
 }
 
-Stream<dynamic> CreateWSConn(Stream<dynamic> actions, EpicStore<AppState> store) {
+Stream<dynamic> CreateDevController(Stream<dynamic> actions, EpicStore<AppState> store) {
   return actions.where((action) => action is EnsureSocketConnection).map(
       (action) {
-        return NewWebSocketConnection(
+        return NewDevController(
           devices: store.state.devices.devices.map((dev) => (dev.id)).toList(),
           token: store.state.userSession.httpToken);
         }
@@ -71,4 +71,4 @@ Stream<dynamic> CreateWSConn(Stream<dynamic> actions, EpicStore<AppState> store)
 }
 
 final ApiRequestMiddleware = new EpicMiddleware(
-    combineEpics<AppState>([Login, GetDevice, CheckIsExistingTokenExpired, CreateWSConn]));
+    combineEpics<AppState>([Login, GetDevice, CheckIsExistingTokenExpired, CreateDevController]));

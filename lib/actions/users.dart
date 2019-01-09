@@ -46,11 +46,11 @@ class QueryDeviceFailureAction {
   QueryDeviceFailureAction(this.errmsg);
 }
 
-class NewWebSocketConnection {
+class NewDevController {
   List<String> devices;
   String token;
 
-  NewWebSocketConnection({this.devices, this.token});
+  NewDevController({this.devices, this.token});
 }
 
 class EnsureSocketConnection {}

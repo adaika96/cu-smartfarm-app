@@ -3,6 +3,8 @@ library cu_smartfarm_app.httpapi;
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+
+import '../actions/device_bloc.dart';
 import '../const.dart' as constants;
 
 // {
@@ -61,6 +63,32 @@ Future<http.Response> RenameDeviceAPI(String token, Map<String, String> param) {
     "payload": jsonEncode({
       "deviceID": param["id"],
       "param": {"name": param["name"]}
+    })
+  });
+}
+
+Future<http.Response> GetDeviceRelayAPI(String token, String deviceID) {
+  return http
+      .post("http://${constants.ServerIP}/api/v1/user/getDeviceInfo", headers: {
+    "Authorization": "Bearer " + token
+  }, body: {
+    "payload": jsonEncode({
+      "deviceID": deviceID,
+    })
+  });
+}
+
+Future<http.Response> SetDeviceRelayAPI(String token, String deviceID, SetDeviceRelaysConfig config) {
+  return http
+      .post("http://${constants.ServerIP}/api/v1/user/setDevice", headers: {
+    "Authorization": "Bearer " + token
+  }, body: {
+    "payload": jsonEncode({
+      "deviceID": deviceID,
+      "param": {
+        "relayID": "Relay${config.relayIndex + 1}",
+        "state": {"mode": config.mode, "detail": config.detail}
+      }
     })
   });
 }

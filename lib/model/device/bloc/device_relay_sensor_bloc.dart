@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'dart:convert';
 
-import '../device_info.dart';
+import '../../device_info.dart';
 
 @immutable
 class ErrorMessage {
@@ -29,10 +29,10 @@ class ErrorMessage {
   }
 }
 
-class DevicePageStatusBLoC extends Bloc<Map<String, dynamic>, DeviceState> {
+class DeviceRelayAndSensorLiveStatusBLoC extends Bloc<Map<String, dynamic>, DeviceState> {
   final String deviceID;
 
-  DevicePageStatusBLoC(this.deviceID);
+  DeviceRelayAndSensorLiveStatusBLoC(this.deviceID);
 
   @override
   DeviceState get initialState => DeviceState(humidity: 0, relayStates: [false], soil: 0, temp: 0);
