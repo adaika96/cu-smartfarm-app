@@ -137,10 +137,6 @@ class _HomePage extends State<HomePage> {
                                 subtitle: Text("ID: " +
                                     widget.deviceList.devices[index - 1].id),
                                 onTap: () {
-                                  // print("[Debug] Tapped on \"" +
-                                  //     widget
-                                  //         .deviceList.devices[index - 1].name +
-                                  //     "\"");
                                   widget.setupDevController();
                                   Navigator.push(context,MaterialPageRoute(
                                       builder: (context) => DevicePageContainer(

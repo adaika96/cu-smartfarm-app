@@ -42,9 +42,9 @@ class OwnedDevice {
 
 @immutable
 class DeviceState {
-  final double soil;
-  final double humidity;
-  final double temp;
+  final num soil;
+  final num humidity;
+  final num temp;
   final List<bool> relayStates;
 
   const DeviceState({this.soil, this.humidity, this.temp, this.relayStates});

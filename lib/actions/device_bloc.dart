@@ -1,3 +1,5 @@
+import 'package:meta/meta.dart';
+
 class ReceivedDeviceRelaysConfig {
   final String jsonState;
 
@@ -9,5 +11,35 @@ class SetDeviceRelaysConfig {
   final String mode;
   final dynamic detail;
 
-  SetDeviceRelaysConfig(this.relayIndex, {this.mode, this.detail});
+  SetDeviceRelaysConfig(
+    this.relayIndex,
+    {
+      this.mode = "manual",
+      detail,
+    }
+  ) : this.detail =
+  (detail != null) ? detail :
+  (mode == "auto") ? { "sensor":"temp", "trigger": 0, "symbol": ">" }:
+  (mode == "scheduled") ? [] : "off" ;
+
+  factory SetDeviceRelaysConfig.Safe(int relayIndex, {@required String mode, @required dynamic detail}){
+    switch (mode) {
+      case "manual":
+        if(["on", "off"].contains(detail))
+          return new SetDeviceRelaysConfig(relayIndex, mode: mode, detail: detail);
+        return null;
+      case "auto":
+        if (detail["sensor"] != null && detail["trigger"] != null && detail["symbol"] != null)
+          return new SetDeviceRelaysConfig(relayIndex, mode: mode, detail: detail);
+        return null;
+      case "scheduled":
+        if(detail is List)
+          return new SetDeviceRelaysConfig(relayIndex, mode: mode, detail: detail);
+        return null;
+      default:
+        return null;
+    }
+  }
+  @override
+    String toString() => 'AppState{relayIndex: $relayIndex, mode: $mode, detail: $detail}';
 }
