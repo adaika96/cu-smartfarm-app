@@ -15,8 +15,8 @@ String escapeOverflowText(String text) {
     return escapedOverflowText;
   }
 // const ServerIP = "192.168.43.21:3000";
-// const ServerIP = "164.115.27.177:3000";
-const ServerIP = "10.0.2.2:3000";
+const ServerIP = "164.115.27.177:3000";
+// const ServerIP = "10.0.2.2:3000";
 const AvailableProvince = [
   "กระบี่",
   "กรุงเทพมหานคร",

@@ -21,6 +21,7 @@ dependencies:
   web_socket_channel: ^1.0.9
   path_provider: ^0.4.1
   html: ^0.13.3+3
+  charts_flutter: ^0.5.0
   flutter:
     sdk: flutter
 

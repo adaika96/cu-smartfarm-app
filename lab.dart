@@ -51,7 +51,7 @@ void main() {
   p.add(1);
   p.add(1);
   p[1] = 5;
-  print(p);
+  print(">> ${["a", "b", "c"].indexOf("a")}");
   try {
     print(al.sd);
   } catch (e) {

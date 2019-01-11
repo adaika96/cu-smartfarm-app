@@ -92,3 +92,17 @@ Future<http.Response> SetDeviceRelayAPI(String token, String deviceID, SetDevice
     })
   });
 }
+
+Future<http.Response> GetDeviceSensorLog(String token, String deviceID) {
+  return http
+      .post("http://${constants.ServerIP}/api/v1/user/getDeviceLog", headers: {
+    "Authorization": "Bearer " + token
+  }, body: {
+    "payload": jsonEncode({
+      "deviceID": deviceID,
+      "param": {
+        "limit": 1000
+      }
+    })
+  });
+}

@@ -10,6 +10,7 @@ import '../../model/device/device_relay_config_state.dart';
 import '../common/errorText.dart';
 import './widget/relay_state.dart';
 import './widget/relay_config_overview.dart';
+import './logs/device_log.dart';
 
 class DevicePageContainer extends StatelessWidget {
   final String deviceID;
@@ -61,6 +62,19 @@ class _DevicePage extends State<DevicePage> {
         appBar: AppBar(
           title: Text('Dashboard (${widget.deviceName})', style: TextStyle(fontSize: 16)),
           actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.equalizer),
+              onPressed: (){
+                Navigator.push(context, MaterialPageRoute(
+                    builder: (context) => DeviceSensorLogsReportContainer(
+                      deviceID: widget.deviceID,
+                      deviceName: widget.deviceName,
+                    ),
+                  ),
+                );
+                // widget.devController.pollDevice(widget.deviceID);
+              },
+            ),
             IconButton(
               icon: Icon(Icons.replay),
               onPressed: (){
