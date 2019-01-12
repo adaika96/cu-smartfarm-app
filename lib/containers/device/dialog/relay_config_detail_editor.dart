@@ -1,20 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:charts_flutter/flutter.dart' as charts;
 import '../../../actions/device_bloc.dart';
-
-// class RelayConfigDetailContainer extends StatelessWidget {
-//   final String mode;
-//   final dynamic initValue;
-//   final GlobalKey<_RelayManualDetailEditorState> _manualKey = GlobalKey();
-//   final GlobalKey<_RelayAutoConfigDetailEditorState> _autoKey = GlobalKey();
-
-//   dynamic get val => (this.mode == "manual") ? _manualKey.currentState.val : _autoKey.currentState.val;
-//   RelayConfigDetailContainer({this.mode, this.initValue});
-
-//   @override
-//   Widget build(BuildContext context) => this.mode == "manual" ?
-//   RelayManualConfigDetailEditor(initVal: initValue, key: _manualKey) : RelayAutoConfigDetailEditor(initVal: initValue, key: _autoKey);
-
-// }
 
 @immutable
 class RelayManualConfigDetailEditor extends StatefulWidget {
@@ -154,6 +140,118 @@ class RelayAutoConfigDetailEditorState extends State<RelayAutoConfigDetailEditor
               )
             ),
           ],
+        )
+      ],
+    );
+  }
+}
+
+@immutable
+class RelayScheduledConfigDetailEditor extends StatefulWidget {
+  final Map<String, dynamic> initVal;
+
+  RelayScheduledConfigDetailEditor({this.initVal, Key key}) : super(key: key);
+
+  @override
+  RelayScheduledConfigDetailEditorState createState() => RelayScheduledConfigDetailEditorState();
+
+}
+
+class RelayScheduledConfigDetailEditorState extends State<RelayScheduledConfigDetailEditor> {
+  List<Map<String, int>> schedule = [
+    {
+      "startHour": 8,
+      "startMin": 0,
+      "endHour": 9,
+      "endMin": 0,
+    },
+    {
+      "startHour": 9,
+      "startMin": 30,
+      "endHour": 10,
+      "endMin": 0,
+    },
+    {
+      "startHour": 11,
+      "startMin": 30,
+      "endHour": 13,
+      "endMin": 30,
+    },
+    {
+      "startHour": 15,
+      "startMin": 0,
+      "endHour": 17,
+      "endMin": 0,
+    }
+  ];
+  charts.Series relayStates;
+  Map<String, dynamic> get val {
+    return {
+      "repeat": true,
+      "timeslots": [
+        {
+          "startHour": 8,
+          "startMin": 0,
+          "endHour": 9,
+          "endMin": 0,
+        }
+      ]
+    };
+  }
+  TextEditingController textInput = TextEditingController();
+  List _expandSchdule(List<Map<String, int>> schedule){
+    List unRolled = schedule.fold([], (unRolling, timeslot){
+      int startMinuteSum = timeslot["startHour"] * 60 + timeslot["startMin"] - 1;
+      int endMinuteSum = timeslot["endHour"] * 60 + timeslot["endMin"] + 1;
+      return unRolling + [
+        [startMinuteSum ~/ 60, startMinuteSum % 60, 0],
+        [timeslot["startHour"], timeslot["startMin"], 1],
+        [timeslot["endHour"], timeslot["endMin"], 1],
+        [endMinuteSum ~/ 60, endMinuteSum % 60, 0],
+      ];
+    });
+    unRolled.insert(0, [0, 0, 0]);
+    unRolled.add([23, 59, 0]);
+    return unRolled;
+  }
+  @override
+    void initState() {
+      var stateTimeline = _expandSchdule(schedule);
+      relayStates =  new charts.Series<dynamic, DateTime>(
+        id: 'Relay State',
+        colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
+        domainFn: (dynamic timepoint, _) {
+          DateTime now = DateTime.now();
+          return DateTime(now.year, now.month, now.day, timepoint[0], timepoint[1]);
+        },
+        measureFn: (dynamic timepoint, _) => timepoint[2],
+        data: stateTimeline
+      );
+      if(widget.initVal != null){
+      }else{
+      }
+      super.initState();
+    }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Container(
+          height: 0.2 * MediaQuery.of(context).size.height,
+          child: charts.TimeSeriesChart(
+            [relayStates],
+            animate: false,
+            domainAxis:  new charts.DateTimeAxisSpec(
+              tickFormatterSpec:
+                new charts.AutoDateTimeTickFormatterSpec(
+                  minute: new charts.TimeFormatterSpec(
+                    format: 'hh:mm', transitionFormat: 'hh:mm'
+                  )
+                )
+              ),
+          ),
         )
       ],
     );

@@ -16,6 +16,9 @@ Future<SetDeviceRelaysConfig> editRelayConfigDialog(BuildContext context, {int r
     case RelayMode.Manual:
       currentStringifiedMode = "manual";
       break;
+    case RelayMode.Scheduled:
+      currentStringifiedMode = "scheduled";
+      break;
     default:
       return Future.delayed(Duration(milliseconds: 1)).then((_)=>SetDeviceRelaysConfig(relayIndex, detail: currentDetail, mode: "")) ;
   }

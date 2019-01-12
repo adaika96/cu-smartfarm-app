@@ -7,10 +7,28 @@ import '../../model/device_info.dart';
 import '../../model/device/device_controller.dart';
 import '../../model/device/device_relay_config_state.dart';
 
+import '../../actions/users.dart';
 import '../common/errorText.dart';
 import './widget/relay_state.dart';
 import './widget/relay_config_overview.dart';
 import './logs/device_log.dart';
+
+class _DevicePageViewModel {
+  final DeviceController devController;
+  final Function recreateDevController;
+
+  _DevicePageViewModel({this.devController, this.recreateDevController});
+
+  @override
+  int get hashCode => devController.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _DevicePageViewModel &&
+          runtimeType == other.runtimeType &&
+          devController == other.devController;
+}
 
 class DevicePageContainer extends StatelessWidget {
   final String deviceID;
@@ -20,17 +38,20 @@ class DevicePageContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StoreConnector<AppState, DeviceController>(
+    return StoreConnector<AppState, _DevicePageViewModel>(
       distinct: true,
       converter: (Store<AppState> store) {
-        return store.state.devController;
+        return _DevicePageViewModel(devController: store.state.devController, recreateDevController: (){
+          store.dispatch(EnsureSocketConnection());
+        });
       },
-      builder: (context, devController) {
-        devController.pollDevice(deviceID);
+      builder: (context, vm) {
+        vm.devController.pollDevice(deviceID);
         return DevicePage(
           deviceID: deviceID,
-          devController: devController,
+          devController: vm.devController,
           deviceName: deviceName,
+          recreateDevController: vm.recreateDevController,
         );
       },
     );
@@ -41,8 +62,9 @@ class DevicePage extends StatefulWidget {
   final String deviceID;
   final String deviceName;
   final DeviceController devController;
+  final Function recreateDevController;
 
-  DevicePage({Key key, this.deviceID, this.deviceName, this.devController})
+  DevicePage({Key key, this.deviceID, this.deviceName, this.devController, this.recreateDevController})
       : super(key: key); // Constructor
 
   @override
@@ -78,7 +100,8 @@ class _DevicePage extends State<DevicePage> {
             IconButton(
               icon: Icon(Icons.replay),
               onPressed: (){
-                widget.devController.pollDevice(widget.deviceID);
+                widget.recreateDevController();
+                // widget.devController.pollDevice(widget.deviceID);
               },
             )
           ],

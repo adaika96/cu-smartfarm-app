@@ -21,7 +21,7 @@ class RelayConfigEditorState extends State<RelayConfigEditor> {
   String mode;
   GlobalKey<RelayManualDetailEditorState>  _manualDetailEditorKey = GlobalKey();
   GlobalKey<RelayAutoConfigDetailEditorState>  _autoDetailEditorKey = GlobalKey();
-  final _availableMode = ["manual", "auto"];
+  final _availableMode = ["manual", "auto", /*"scheduled"*/];
 
   SetDeviceRelaysConfig get value{
     return SetDeviceRelaysConfig.Safe(
@@ -86,6 +86,32 @@ class RelayConfigEditorState extends State<RelayConfigEditor> {
                   ),
                 ),
                 RelayAutoConfigDetailEditor(initVal: (widget.initDetail is Map) ? widget.initDetail : null, key: _autoDetailEditorKey,)
+              ],
+            ),
+        );
+      case "scheduled":
+        return Container(
+            child: ListView(
+              children: <Widget>[
+                ListTile(
+                  title: new DropdownButton<String>(
+                    isExpanded: true,
+                    items: _availableMode.map((String value) {
+                      return new DropdownMenuItem<String>(
+                        value: value,
+                        child: new Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        mode = value;
+                      });
+                    },
+                    hint: Text("Mode"),
+                    value: mode,
+                  ),
+                ),
+                RelayScheduledConfigDetailEditor(initVal: (widget.initDetail is Map) ? widget.initDetail : null, key: _autoDetailEditorKey,)
               ],
             ),
         );

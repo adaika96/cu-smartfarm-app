@@ -1,67 +1,41 @@
-import 'package:bloc/bloc.dart';
-import 'dart:convert';
-abstract class CounterEvent {}
-
-class Increment extends CounterEvent {
-  @override
-  String toString() => 'Increment';
-}
-
-class Decrement extends CounterEvent {
-  @override
-  String toString() => 'Decrement';
-}
-
-class CounterBloc extends Bloc<CounterEvent, int> {
-  @override
-  int get initialState => 0;
-
-  @override
-  Stream<int> mapEventToState(int currentState, CounterEvent event) async* {
-    if (event is Increment) {
-      /// Simulating Network Latency
-      await Future<void>.delayed(Duration(seconds: 1));
-      yield currentState + 1;
+void main(List<String> args) {
+  List<Map<String, int>> schedule = [
+    {
+      "startHour": 8,
+      "startMin": 0,
+      "endHour": 9,
+      "endMin": 0,
+    },
+    {
+      "startHour": 9,
+      "startMin": 30,
+      "endHour": 10,
+      "endMin": 0,
+    },
+    {
+      "startHour": 11,
+      "startMin": 30,
+      "endHour": 13,
+      "endMin": 30,
+    },
+    {
+      "startHour": 15,
+      "startMin": 0,
+      "endHour": 17,
+      "endMin": 0,
     }
-    if (event is Decrement) {
-      /// Simulating Network Latency
-      await Future<void>.delayed(Duration(milliseconds: 500));
-      yield currentState - 1;
-    }
-  }
-}
-
-class SimpleBlocDelegate implements BlocDelegate {
-  @override
-  void onTransition(Transition transition) {
-    print(transition.toString());
-  }
-}
-
-void main() {
-  BlocSupervisor().delegate = SimpleBlocDelegate();
-
-  final counterBloc = CounterBloc();
-  counterBloc.state.listen((data) {
-    print(data);
+  ];
+  List unRolled = schedule.fold([], (unRolling, timeslot){
+    int startMinuteSum = timeslot["startHour"] * 60 + timeslot["startMin"] - 1;
+    int endMinuteSum = timeslot["endHour"] * 60 + timeslot["endMin"] + 1;
+    return unRolling + [
+      [startMinuteSum ~/ 60, startMinuteSum % 60, 0],
+      [timeslot["startHour"], timeslot["startMin"], 1],
+      [timeslot["endHour"], timeslot["endMin"], 1],
+      [endMinuteSum ~/ 60, endMinuteSum % 60, 0],
+    ];
   });
-  dynamic al;
-  List<int> p = List();
-  p.add(1);
-  p.add(1);
-  p.add(1);
-  p[1] = 5;
-  print(">> ${["a", "b", "c"].indexOf("a")}");
-  try {
-    print(al.sd);
-  } catch (e) {
-    print("error".toString());
-  }
-  counterBloc.dispatch(Increment());
-  counterBloc.dispatch(Increment());
-  counterBloc.dispatch(Increment());
-
-  counterBloc.dispatch(Decrement());
-  counterBloc.dispatch(Decrement());
-  counterBloc.dispatch(Decrement());
+  unRolled.insert(0, [0, 0, 0]);
+  unRolled.add([23, 59, 0]);
+  print(unRolled);
 }
