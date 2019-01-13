@@ -37,5 +37,5 @@ void main(List<String> args) {
   });
   unRolled.insert(0, [0, 0, 0]);
   unRolled.add([23, 59, 0]);
-  print(unRolled);
+  print(List<num>.generate(5, (i) => (i)));
 }

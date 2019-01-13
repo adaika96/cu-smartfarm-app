@@ -142,58 +142,27 @@ class _DeviceSensorLogsViewerState extends State<DeviceSensorLogsViewer> {
         Container(
           width: 0.95 * MediaQuery.of(context).size.width,
           child:Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               Row(
                 children: <Widget>[Text("Displaying latest $limit record(s)")],
                 mainAxisAlignment: MainAxisAlignment.start,
               ),
               Text("Humidity", style: TextStyle(fontSize: 16)),
-              // Container(
-              //   height: 0.20 * MediaQuery.of(context).size.height,
-              //   child: charts.TimeSeriesChart(
-              //     [humidLogs],
-              //     animate: false,
-              //     behaviors: [new charts.RangeAnnotation(
-              //       [20, 40, 60, 80, 100].map(
-              //         (annotationPoint)=>
-              //           new charts.LineAnnotationSegment(annotationPoint,
-              //           charts.RangeAnnotationAxisType.measure,
-              //           color: charts.MaterialPalette.gray.shade300,
-              //           labelPosition: charts.AnnotationLabelPosition.outside,
-              //           labelStyleSpec: charts.TextStyleSpec(fontSize: 8),
-              //           startLabel: "${annotationPoint - 20} - $annotationPoint")
-              //       ).toList()
-              //     )],
-              //     domainAxis:  new charts.DateTimeAxisSpec(
-              //       tickFormatterSpec:
-              //         new charts.AutoDateTimeTickFormatterSpec(
-              //           minute: new charts.TimeFormatterSpec(
-              //             format: 'hh:mm', transitionFormat: 'hh:mm'
-              //           )
-              //         )
-              //       ),
-              //   ),
-              // ),
               Container(
                 height: 0.17 * MediaQuery.of(context).size.height,
                 child: charts.TimeSeriesChart(
                   [humidLogs],
                   animate: false,
-                  behaviors: [new charts.RangeAnnotation(
-                    new List<num>.generate(5, (i) => minLoggedHumid.floor() + ((maxLoggedHumid.ceil() - minLoggedHumid.floor()) / 5) * i).map(
-                      (annotationPoint)=>
-                        new charts.LineAnnotationSegment(annotationPoint,
-                        charts.RangeAnnotationAxisType.measure,
-                        labelPosition: charts.AnnotationLabelPosition.outside,
-                        labelStyleSpec: charts.TextStyleSpec(fontSize: 5),
-                        color: charts.MaterialPalette.gray.shade300,
-                        endLabel: "$annotationPoint - ${(annotationPoint + (maxLoggedHumid.ceil() - minLoggedHumid.floor()) / 5).toStringAsFixed(1)}")
-                    ).toList()
-                  )],
                   primaryMeasureAxis: charts.NumericAxisSpec(
                     viewport: charts.NumericExtents(minLoggedHumid.floor(),maxLoggedHumid.ceil()),
-                    showAxisLine: false
+                    showAxisLine: true,
+                    tickProviderSpec: charts.StaticNumericTickProviderSpec(
+                      List<num>.generate(6, (i) => minLoggedHumid.floor() + ((maxLoggedHumid.ceil() - minLoggedHumid.floor()) / 5) * i).map(
+                        (annotationPoint)=>
+                          new charts.TickSpec(annotationPoint, label: "${annotationPoint.toStringAsFixed(2)}")
+                      ).toList()
+                    ),
                   ),
                   domainAxis:  new charts.DateTimeAxisSpec(
                     tickFormatterSpec:
@@ -227,22 +196,18 @@ class _DeviceSensorLogsViewerState extends State<DeviceSensorLogsViewer> {
                 child: charts.TimeSeriesChart(
                   [tempLogs],
                   animate: false,
-                  behaviors: [new charts.RangeAnnotation(
-                    new List<num>.generate(5, (i) => minLoggedTemp.floor() + ((maxLoggedTemp.ceil() - minLoggedTemp.floor()) / 5) * i).map(
-                      (annotationPoint)=>
-                        new charts.LineAnnotationSegment(annotationPoint,
-                        charts.RangeAnnotationAxisType.measure,
-                        labelPosition: charts.AnnotationLabelPosition.outside,
-                        labelStyleSpec: charts.TextStyleSpec(fontSize: 5),
-                        color: charts.MaterialPalette.gray.shade300,
-                        endLabel: "$annotationPoint - ${(annotationPoint + (maxLoggedTemp.ceil() - minLoggedTemp.floor()) / 5).toStringAsFixed(1)}")
-                    ).toList()
-                  )],
                   primaryMeasureAxis: charts.NumericAxisSpec(
                     viewport: charts.NumericExtents(minLoggedTemp.floor(),maxLoggedTemp.ceil()),
-                    showAxisLine: false
+                    tickProviderSpec: charts.StaticNumericTickProviderSpec(
+                      List<num>.generate(6, (i) => minLoggedTemp.floor() + ((maxLoggedTemp.ceil() - minLoggedTemp.floor()) / 5) * i).map(
+                        (annotationPoint)=>
+                          new charts.TickSpec(annotationPoint, label: "${annotationPoint.toStringAsFixed(2)}")
+                      ).toList()
+                    ),
+                    showAxisLine: true
                   ),
                   domainAxis:  new charts.DateTimeAxisSpec(
+                    showAxisLine: true,
                     tickFormatterSpec:
                       new charts.AutoDateTimeTickFormatterSpec(
                         minute: new charts.TimeFormatterSpec(
