@@ -90,6 +90,8 @@ Future<http.Response> SetDeviceRelayAPI(String token, String deviceID, SetDevice
         "state": {"mode": config.mode, "detail": config.detail}
       }
     })
+  }).then((resp){
+    print("Response >> ${resp.body}");
   });
 }
 

@@ -137,6 +137,7 @@ class _DevicePage extends State<DevicePage> {
                       return Wrap(
                         children: <Widget>[
                           snapshot.connectionState == ConnectionState.active ? RelayConfigChart(relaysConfig: snapshot.data, setRelayConfig: (newConfig){
+                            print("[newConfig] >> $newConfig");
                             widget.devController.devRelayConfig[widget.deviceID].dispatch(newConfig);
                           },):
                           Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[new CircularProgressIndicator()])

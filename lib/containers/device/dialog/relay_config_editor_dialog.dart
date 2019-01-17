@@ -33,6 +33,7 @@ Future<SetDeviceRelaysConfig> editRelayConfigDialog(BuildContext context, {int r
             margin: EdgeInsets.only(top: 10),
             child: MaterialButton(
               onPressed: () {
+                print("Return value ${_key.currentState.value}");
                 Navigator.of(context).pop(_key.currentState.value);
               },
               color: Colors.black,

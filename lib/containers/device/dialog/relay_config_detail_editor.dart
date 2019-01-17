@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
-import '../../../actions/device_bloc.dart';
+import 'package:datetime_picker_formfield/time_picker_formfield.dart';
+import 'package:intl/intl.dart';
+
+import './drawer/schedule_table_drawer.dart';
 
 @immutable
 class RelayManualConfigDetailEditor extends StatefulWidget {
@@ -148,7 +150,7 @@ class RelayAutoConfigDetailEditorState extends State<RelayAutoConfigDetailEditor
 
 @immutable
 class RelayScheduledConfigDetailEditor extends StatefulWidget {
-  final Map<String, dynamic> initVal;
+  final List<dynamic> initVal;
 
   RelayScheduledConfigDetailEditor({this.initVal, Key key}) : super(key: key);
 
@@ -158,101 +160,148 @@ class RelayScheduledConfigDetailEditor extends StatefulWidget {
 }
 
 class RelayScheduledConfigDetailEditorState extends State<RelayScheduledConfigDetailEditor> {
-  List<Map<String, int>> schedule = [
-    {
-      "startHour": 8,
-      "startMin": 0,
-      "endHour": 9,
-      "endMin": 0,
-    },
-    {
-      "startHour": 9,
-      "startMin": 30,
-      "endHour": 10,
-      "endMin": 0,
-    },
-    {
-      "startHour": 11,
-      "startMin": 30,
-      "endHour": 13,
-      "endMin": 30,
-    },
-    {
-      "startHour": 15,
-      "startMin": 0,
-      "endHour": 17,
-      "endMin": 0,
-    }
-  ];
-  charts.Series relayStates;
-  Map<String, dynamic> get val {
-    return {
-      "repeat": true,
-      "timeslots": [
-        {
-          "startHour": 8,
-          "startMin": 0,
-          "endHour": 9,
-          "endMin": 0,
-        }
-      ]
-    };
+  List<dynamic> schedule;
+  List<dynamic> get val {
+    return schedule;
   }
-  TextEditingController textInput = TextEditingController();
-  List _expandSchdule(List<Map<String, int>> schedule){
-    List unRolled = schedule.fold([], (unRolling, timeslot){
-      int startMinuteSum = timeslot["startHour"] * 60 + timeslot["startMin"] - 1;
-      int endMinuteSum = timeslot["endHour"] * 60 + timeslot["endMin"] + 1;
-      return unRolling + [
-        [startMinuteSum ~/ 60, startMinuteSum % 60, 0],
-        [timeslot["startHour"], timeslot["startMin"], 1],
-        [timeslot["endHour"], timeslot["endMin"], 1],
-        [endMinuteSum ~/ 60, endMinuteSum % 60, 0],
-      ];
-    });
-    unRolled.insert(0, [0, 0, 0]);
-    unRolled.add([23, 59, 0]);
-    return unRolled;
-  }
+  var timeEditorList = <Widget>[];
   @override
     void initState() {
-      var stateTimeline = _expandSchdule(schedule);
-      relayStates =  new charts.Series<dynamic, DateTime>(
-        id: 'Relay State',
-        colorFn: (_, __) => charts.MaterialPalette.red.shadeDefault,
-        domainFn: (dynamic timepoint, _) {
-          DateTime now = DateTime.now();
-          return DateTime(now.year, now.month, now.day, timepoint[0], timepoint[1]);
-        },
-        measureFn: (dynamic timepoint, _) => timepoint[2],
-        data: stateTimeline
-      );
       if(widget.initVal != null){
+        schedule = widget.initVal;
       }else{
+        schedule = [];
       }
       super.initState();
     }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return ListView(
       children: <Widget>[
         Container(
-          height: 0.2 * MediaQuery.of(context).size.height,
-          child: charts.TimeSeriesChart(
-            [relayStates],
-            animate: false,
-            domainAxis:  new charts.DateTimeAxisSpec(
-              tickFormatterSpec:
-                new charts.AutoDateTimeTickFormatterSpec(
-                  minute: new charts.TimeFormatterSpec(
-                    format: 'hh:mm', transitionFormat: 'hh:mm'
+          height: 0.1 * MediaQuery.of(context).size.height,
+          child: CustomPaint(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: (){
+                var hourTickPoint = <Widget>[];
+                List.generate(12, (i)=>(i+1)).forEach((index){
+                  var _hours = index * (24/12);
+                  hourTickPoint.add(
+                    Expanded(
+                      child: Text("${_hours < 10 ? 0 : ""}${_hours.toInt()}",textAlign: TextAlign.right, style: TextStyle(color: Colors.white, fontSize: 10),),
+                    )
+                  );
+                });
+                return hourTickPoint;
+              }()
+            ),
+            painter: ScheduleDrawer(hourTickCount: 12, schedule: schedule),
+          )
+        ),
+        Container(
+          height: 0.28 * MediaQuery.of(context).size.height,
+          child: ListView(
+            children: (){
+              var timeEditorList = <Widget>[];
+              for (int index = 0; index < schedule.length; index++) {
+                var timeSlot = schedule[index];
+                timeEditorList.add(
+                  new Row(
+                    children: <Widget>[
+                      Expanded(
+                        flex: 2,
+                        child:
+                          new TimePickerFormField(
+                            format: DateFormat("HH:mm"),
+                            decoration: InputDecoration(labelText: 'Start'),
+                            initialValue: timeSlot["startHour"] == null ? null : TimeOfDay(
+                              hour: timeSlot["startHour"],
+                              minute: timeSlot["startMin"]
+                            ),
+                            initialTime: timeSlot["startHour"] == null ? null : TimeOfDay(
+                              hour: timeSlot["startHour"],
+                              minute: timeSlot["startMin"]
+                            ),
+                            onChanged: (t) => setState((){
+                              if(t != null){
+                                timeSlot["startHour"] = t.hour;
+                                timeSlot["startMin"] = t.minute;
+                              }
+                            }),
+                          ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child:
+                          new TimePickerFormField(
+                            format: DateFormat("HH:mm"),
+                            decoration: InputDecoration(labelText: 'End'),
+                            initialValue: timeSlot["endHour"] == null ? null : TimeOfDay(
+                              hour: timeSlot["endHour"],
+                              minute: timeSlot["endMin"]
+                            ),
+                            initialTime: timeSlot["endHour"] == null ? null : TimeOfDay(
+                              hour: timeSlot["endHour"],
+                              minute: timeSlot["endMin"]
+                            ),
+                            onChanged: (t) => setState((){
+                              if (t != null) {
+                                timeSlot["endHour"] = t.hour;
+                                timeSlot["endMin"] = t.minute;
+                              }
+                            }),
+                          ),
+                      ),
+                    ],
                   )
-                )
-              ),
+                );
+              }
+              return timeEditorList;
+            }()
           ),
-        )
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Container(
+              width: 85,
+              child: MaterialButton(
+                textColor: Colors.red,
+                onPressed: (){
+                  setState(() {
+                    schedule.add({});
+                  });
+                },
+                child: Row(
+                  children: <Widget>[
+                    Text("Add"),
+                    Icon(Icons.add)
+                  ],
+                ),
+              ),
+            ),
+            Container(
+              width:110,
+              child: MaterialButton(
+                textColor: Colors.black,
+                onPressed: (){
+                  setState(() {
+                    schedule.removeLast();
+                  });
+                },
+                child: Row(
+                  children: <Widget>[
+                    Text("Remove"),
+                    Icon(Icons.remove_circle)
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }

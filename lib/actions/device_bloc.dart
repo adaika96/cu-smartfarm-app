@@ -20,7 +20,9 @@ class SetDeviceRelaysConfig {
   ) : this.detail =
   (detail != null) ? detail :
   (mode == "auto") ? { "sensor":"temp", "trigger": 0, "symbol": ">" }:
-  (mode == "scheduled") ? [] : "off" ;
+  (mode == "scheduled") ? [] : "off"{
+    print(mode);
+  }
 
   factory SetDeviceRelaysConfig.Safe(int relayIndex, {@required String mode, @required dynamic detail}){
     switch (mode) {
@@ -33,7 +35,7 @@ class SetDeviceRelaysConfig {
           return new SetDeviceRelaysConfig(relayIndex, mode: mode, detail: detail);
         return null;
       case "scheduled":
-        if(detail is List)
+        if(detail["repeat"] is bool && (detail["schedules"] as List<dynamic>).length > 0)
           return new SetDeviceRelaysConfig(relayIndex, mode: mode, detail: detail);
         return null;
       default:
