@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:qrcode_reader/qrcode_reader.dart';
+
 import '../../../const.dart' as constants;
 import '../../../api/httpAPI.dart' as httpapi;
-import 'dart:convert';
 
 class AddDevicePage extends StatefulWidget {
   String token;
@@ -105,15 +107,44 @@ class _AddDeviceFormState extends State<AddDevicePage> {
                             ),
                             Container(
                               margin: const EdgeInsets.only(top: 30),
-                              child: TextFormField(
-                                  controller: secret,
-                                  decoration: InputDecoration(
-                                      labelText: 'Device secret'),
-                                  validator: (value) {
-                                    if (value.isEmpty) {
-                                      return 'Device secret cannot be empty';
-                                    }
-                                  }),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: <Widget>[
+                                  Container(
+                                    width: 0.5 * MediaQuery.of(context).size.width,
+                                    child:
+                                      TextFormField(
+                                        controller: secret,
+                                        decoration: InputDecoration(
+                                            labelText: 'Device secret'),
+                                        validator: (value) {
+                                          if (value.isEmpty) {
+                                            return 'Device secret cannot be empty';
+                                          }
+                                        }),
+                                  ),
+                                  MaterialButton(
+                                    color: Colors.red,
+                                    textColor: Colors.white,
+                                    child: Text("Scan QR CODE"),
+                                    onPressed: () async {
+                                      String qrsecret = await new QRCodeReader()
+                                      .setAutoFocusIntervalInMs(200) // default 5000
+                                      .setForceAutoFocus(true) // default false
+                                      .setTorchEnabled(true) // default false
+                                      .setHandlePermissions(true) // default true
+                                      .setExecuteAfterPermissionGranted(true) // default true
+                                      .scan();
+                                      if(qrsecret != null){
+                                        setState(() {
+                                          secret.text = qrsecret;
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ],
+                              )
                             ),
                             Container(
                               margin: const EdgeInsets.only(top: 30),

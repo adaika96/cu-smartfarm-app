@@ -113,7 +113,7 @@ class _HomePage extends State<HomePage> {
                                   if (await editDialog(
                                       context,
                                       widget.deviceList.devices[index - 1],
-                                      widget.token)) {
+                                      widget.token) != null) {
                                     widget.reload();
                                   }
                                 },
@@ -124,7 +124,7 @@ class _HomePage extends State<HomePage> {
                                       if (await confirmDeletion(
                                           context,
                                           widget.deviceList.devices[index - 1],
-                                          widget.token)) {
+                                          widget.token) == true) {
                                         widget.reload();
                                       }
                                     },
