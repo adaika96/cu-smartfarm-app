@@ -125,6 +125,11 @@ class _DevicePage extends State<DevicePage> {
                             "detail": newState ? "on":"off"
                           });
                         },
+                        relayDesc: snapshot.data.relayDesc,
+                        handleChangeRelayDesc: (int index, String desc){
+                          // httpapi.SetRelayDescAPI(widget.devController., deviceID, relayIndex, desc)
+                          widget.devController.setRelayDesc(widget.deviceID, index, desc);
+                        },
                       ): Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[new CircularProgressIndicator()]);
                     }
                   ),

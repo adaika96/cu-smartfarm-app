@@ -39,7 +39,7 @@ Future<http.Response> AddDeviceAPI(String token, Map<String, String> param) {
   }, body: {
     "payload": jsonEncode({
       "deviceID": param["id"],
-      "param": {"deviceSecret": param["secret"], "deviceName": param["name"]}
+      "param": {"deviceSecret": param["secret"], "deviceName": param["name"], "deviceDesc":""}
     })
   });
 }
@@ -57,7 +57,7 @@ Future<http.Response> RemoveDeviceAPI(String token, String deviceID) {
 
 Future<http.Response> RenameDeviceAPI(String token, Map<String, String> param) {
   return http
-      .post("http://${constants.ServerIP}/api/v1/user/renameDevice", headers: {
+      .post("http://${constants.ServerIP}/api/v1/user/editDevice", headers: {
     "Authorization": "Bearer " + token
   }, body: {
     "payload": jsonEncode({
@@ -80,7 +80,7 @@ Future<http.Response> GetDeviceRelayAPI(String token, String deviceID) {
 
 Future<http.Response> SetDeviceRelayAPI(String token, String deviceID, SetDeviceRelaysConfig config) {
   return http
-      .post("http://${constants.ServerIP}/api/v1/user/setDevice", headers: {
+      .post("http://${constants.ServerIP}/api/v1/user/setRelay", headers: {
     "Authorization": "Bearer " + token
   }, body: {
     "payload": jsonEncode({
@@ -105,6 +105,30 @@ Future<http.Response> GetDeviceSensorLog(String token, String deviceID, int limi
       "param": {
         "limit": limit
       }
+    })
+  });
+}
+
+Future<http.Response> SetRelayDescAPI(String token, String deviceID, int relayIndex, String desc) {
+  return http.post("http://${constants.ServerIP}/api/v1/user/setRelayName", headers: {
+    "Authorization": "Bearer " + token
+  }, body: {
+    "payload": jsonEncode({
+      "deviceID": deviceID,
+      "param": {
+        "relayID": "Relay${relayIndex + 1}",
+        "desc": desc
+      }
+    })
+  });
+}
+
+Future<http.Response> GetRelayDescAPI(String token, String deviceID) {
+  return http.post("http://${constants.ServerIP}/api/v1/user/getRelayNames", headers: {
+    "Authorization": "Bearer " + token
+  }, body: {
+    "payload": jsonEncode({
+      "deviceID": deviceID
     })
   });
 }

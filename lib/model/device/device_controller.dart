@@ -4,12 +4,14 @@ import 'dart:convert';
 
 import '../../const.dart' as constants;
 import '../../actions/device_bloc.dart';
+import '../../api/httpAPI.dart' as httpapi;
 import './bloc/device_relay_sensor_bloc.dart';
 import './bloc/device_relay_config_bloc.dart';
 
 class DeviceController {
   WebSocketChannel _conn;
   String _wsToken;
+  String _httpToken;
   Map<String, DeviceRelayAndSensorLiveStatusBLoC> statusBlocs;
   Map<String, DeviceRelayConfigBLoC> devRelayConfig;
   DevicePageAPIResultBLoC errorReportBloc;
@@ -21,8 +23,9 @@ class DeviceController {
     devRelayConfig = new Map();
     errorReportBloc = new DevicePageAPIResultBLoC();
     devices.forEach((devname) {
-      statusBlocs[devname] = DeviceRelayAndSensorLiveStatusBLoC(devname);
-      devRelayConfig[devname] = DeviceRelayConfigBLoC(deviceID: devname, httpToken: token);
+      statusBlocs[devname] = DeviceRelayAndSensorLiveStatusBLoC(deviceID: devname, httpToken: token);
+      devRelayConfig[devname] =
+          DeviceRelayConfigBLoC(deviceID: devname, httpToken: token);
     });
     this._conn = IOWebSocketChannel.connect(
         'ws://${constants.ServerIP}/subscribe/ws',
@@ -35,6 +38,7 @@ class DeviceController {
       this.statusBlocs.forEach((_, bloc) => bloc.dispatch(data));
       this.errorReportBloc.dispatch(data);
     });
+    this._httpToken = token;
   }
 
   // factory WebSocketAPIConnection.WithNewToken(WebSocketAPIConnection old, String token){
@@ -54,22 +58,18 @@ class DeviceController {
 
   // Wrapper for DeviceRelayConfigBLoC.dispatch(SetDeviceRelaysConfig)
   void setDevice(String deviceID, int relayIndex, Map<String, dynamic> state) {
-    // var qMessage = {
-    //   "endPoint": "setDevice",
-    //   "token": _wsToken,
-    //   "payload": {
-    //     "deviceID": deviceID,
-    //     "param": {"relayIndex": relayIndex, "state": state}
-    //   }
-    // };
-    // _conn.sink.add(jsonEncode(qMessage));
-    this.devRelayConfig[deviceID].dispatch(
-      SetDeviceRelaysConfig(
-        relayIndex,
-        mode: state["mode"],
-        detail: state["detail"]
-      )
-    );
+    this.devRelayConfig[deviceID].dispatch(SetDeviceRelaysConfig(relayIndex,
+        mode: state["mode"], detail: state["detail"]));
+  }
+
+  // Wrapper for DeviceRelayConfigBLoC.dispatch(SetDeviceRelaysConfig)
+  void setRelayDesc(String deviceID, int relayIndex, String desc) {
+    httpapi.SetRelayDescAPI(_httpToken, deviceID, relayIndex, desc).then((_) {
+      this.statusBlocs[deviceID].dispatch({
+        "t": "relayDescChanged",
+        "payload": {"relayIndex": relayIndex, "newRelayDesc": desc}
+      });
+    });
   }
 
   void getLatestState(String deviceID) {

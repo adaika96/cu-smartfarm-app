@@ -21,7 +21,7 @@ class RelayManualDetailEditorState extends State<RelayManualConfigDetailEditor> 
 
   @override
     void initState() {
-      val = widget.initVal;
+      val = widget.initVal ?? "off";
       super.initState();
     }
   @override

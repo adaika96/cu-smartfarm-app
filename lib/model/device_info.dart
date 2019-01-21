@@ -46,10 +46,17 @@ class DeviceState {
   final num humidity;
   final num temp;
   final List<bool> relayStates;
+  final List<String> relayDesc;
 
-  const DeviceState({this.soil, this.humidity, this.temp, this.relayStates});
+  const DeviceState(
+      {@required this.soil,
+      @required this.humidity,
+      @required this.temp,
+      @required this.relayStates,
+      @required this.relayDesc});
 
-  factory DeviceState.FromMap(Map<String, dynamic> state) {
+  factory DeviceState.FromMap(Map<String, dynamic> state,
+      {List<String> relayDesc}) {
     List<bool> relayStates = List();
     for (var i = 1; i <= 5; i++) {
       relayStates.add(state["Relay$i"] == "on");
@@ -58,7 +65,17 @@ class DeviceState {
         soil: state["Soil"],
         humidity: state["Humidity"],
         temp: state["Temp"],
-        relayStates: relayStates);
+        relayStates: relayStates,
+        relayDesc: relayDesc ?? ["", "", "", "", ""]);
+  }
+
+  DeviceState changeRelayDesc({List<String> newRelayDesc}) {
+    return DeviceState(
+        soil: soil,
+        humidity: humidity,
+        temp: temp,
+        relayStates: relayStates,
+        relayDesc: newRelayDesc);
   }
 
   @override

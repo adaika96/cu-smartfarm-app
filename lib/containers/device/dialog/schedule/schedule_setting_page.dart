@@ -64,7 +64,8 @@ class _ScheduleEditPage extends State<ScheduleEditPage> {
                       onPressed: () {
                         Navigator.of(context).pop({
                           "repeat": repeat,
-                          "schedules": _scheduleEditorKey.currentState.val
+                          "schedules": _scheduleEditorKey.currentState.val,
+                          "createdAt": "${DateTime.now().toIso8601String().split(".")[0]}+07:00"
                         });
                       },
                     )

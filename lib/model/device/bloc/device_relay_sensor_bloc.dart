@@ -3,6 +3,7 @@ import 'package:meta/meta.dart';
 import 'dart:convert';
 
 import '../../device_info.dart';
+import '../../../api/httpAPI.dart' as httpapi;
 
 @immutable
 class ErrorMessage {
@@ -32,15 +33,40 @@ class ErrorMessage {
 class DeviceRelayAndSensorLiveStatusBLoC extends Bloc<Map<String, dynamic>, DeviceState> {
   final String deviceID;
 
-  DeviceRelayAndSensorLiveStatusBLoC(this.deviceID);
+  DeviceRelayAndSensorLiveStatusBLoC({this.deviceID, String httpToken}){
+    httpapi.GetRelayDescAPI(httpToken, deviceID).then(
+      (resp){
+        var data = jsonDecode(resp.body);
+        List receivedRelayDesc = List<String>.from(data["data"]);
+        for (var i = 0; i < receivedRelayDesc.length; i++) {
+          dispatch({
+            "t": "relayDescChanged",
+            "payload": {
+              "relayIndex": i,
+              "newRelayDesc": receivedRelayDesc[i] == "" ? "Relay${i+1}" : receivedRelayDesc[i]
+            }
+          });
+        }
+      }
+    );
+  }
 
   @override
-  DeviceState get initialState => DeviceState(humidity: 0, relayStates: [false], soil: 0, temp: 0);
+  DeviceState get initialState => DeviceState(
+    humidity: 0,
+    relayStates: [null, null, null, null, null],
+    soil: 0,
+    temp: 0,
+    relayDesc: ["Relay1", "Relay2", "Relay3", "Relay4", "Relay5"]
+  ); // Must call API
 
   @override
   Stream<DeviceState> mapEventToState(DeviceState currentState, Map<String, dynamic> message) async* {
     if(message["t"] == "report" && message["d"] == this.deviceID){
-      yield DeviceState.FromMap(jsonDecode(jsonEncode(message["payload"])));
+      yield DeviceState.FromMap(jsonDecode(jsonEncode(message["payload"])), relayDesc: currentState.relayDesc);
+    }else if (message["t"] == "relayDescChanged") {
+      currentState.relayDesc[message["payload"]["relayIndex"]] = message["payload"]["newRelayDesc"];
+      yield currentState.changeRelayDesc(newRelayDesc: List.from(currentState.relayDesc));
     }
   }
 }
