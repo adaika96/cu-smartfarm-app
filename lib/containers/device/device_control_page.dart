@@ -122,7 +122,7 @@ class _DevicePage extends State<DevicePage> {
                         handleToggleRelayState: (int index, bool newState){
                           widget.devController.setDevice(widget.deviceID, index, {
                             "mode": "manual",
-                            "detail": newState ? "on":"off"
+                            "detail": snapshot.data.relayStates[index],
                           });
                         },
                         relayDesc: snapshot.data.relayDesc,
@@ -161,7 +161,7 @@ class _DevicePage extends State<DevicePage> {
                         mainAxisSize: MainAxisSize.max,
                         children: <Widget>[
                           Column(children: <Widget>[Icon(Icons.settings_input_component), Text("Humidity \n(${snapshot.data.humidity.toStringAsFixed(1)}%)", textAlign: TextAlign.center)]),
-                          Column(children: <Widget>[Icon(Icons.settings_input_component), Text("Soil \n(${snapshot.data.soil.toStringAsFixed(1)})", textAlign: TextAlign.center)]),
+                          Column(children: <Widget>[Icon(Icons.settings_input_component), Text("Soil \n(${snapshot.data.soil.toStringAsFixed(1)}%)", textAlign: TextAlign.center)]),
                           Column(children: <Widget>[Icon(Icons.settings_input_component), Text("Temp \n(${snapshot.data.temp.toStringAsFixed(1)}°C)", textAlign: TextAlign.center)])
                         ],
                       ) : Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[new CircularProgressIndicator()],);

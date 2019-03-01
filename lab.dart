@@ -25,18 +25,19 @@ void main(List<String> args) {
       "endMin": 0,
     }
   ];
-  List unRolled = schedule.fold([], (unRolling, timeslot){
+  List unRolled = schedule.fold([], (unRolling, timeslot) {
     int startMinuteSum = timeslot["startHour"] * 60 + timeslot["startMin"] - 1;
     int endMinuteSum = timeslot["endHour"] * 60 + timeslot["endMin"] + 1;
-    return unRolling + [
-      [startMinuteSum ~/ 60, startMinuteSum % 60, 0],
-      [timeslot["startHour"], timeslot["startMin"], 1],
-      [timeslot["endHour"], timeslot["endMin"], 1],
-      [endMinuteSum ~/ 60, endMinuteSum % 60, 0],
-    ];
+    return unRolling +
+        [
+          [startMinuteSum ~/ 60, startMinuteSum % 60, 0],
+          [timeslot["startHour"], timeslot["startMin"], 1],
+          [timeslot["endHour"], timeslot["endMin"], 1],
+          [endMinuteSum ~/ 60, endMinuteSum % 60, 0],
+        ];
   });
   unRolled.insert(0, [0, 0, 0]);
   unRolled.add([23, 59, 0]);
-  print("" ?? "folder");
+  print(schedule.take( schedule.length));
   // print(List<num>.generate(5, (i) => (i)));
 }

@@ -1,22 +1,21 @@
 library cu_smartfarm_app.constant;
 
 String escapeOverflowText(String text) {
-    String escapedOverflowText = "";
-    String line = "";
-    for (var chunk in text.split(" ")) {
-      if ((line + chunk).length < 40) {
-        line += " " + chunk;
-      } else {
-        escapedOverflowText += line + "\n";
-        line = "";
-      }
+  String escapedOverflowText = "";
+  String line = "";
+  for (var chunk in text.split(" ")) {
+    if ((line + chunk).length < 40) {
+      line += " " + chunk;
+    } else {
+      escapedOverflowText += line + "\n";
+      line = "";
     }
-    escapedOverflowText += line;
-    return escapedOverflowText;
   }
-// const ServerIP = "192.168.43.21:3000";
-const ServerIP = "164.115.27.177:3000";
-// const ServerIP = "10.0.2.2:3000";
+  escapedOverflowText += line;
+  return escapedOverflowText;
+}
+
+const ServerIP = "164.115.27.177:3335";
 const AvailableProvince = [
   "กระบี่",
   "กรุงเทพมหานคร",

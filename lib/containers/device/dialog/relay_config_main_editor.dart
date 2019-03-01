@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import './drawer/schedule_table_drawer.dart';
 import './relay_config_detail_editor.dart';
 import './schedule/schedule_setting_page.dart';
 import '../../../actions/device_bloc.dart';
+import '../widget/schedule_timeline.dart';
 
 class RelayConfigEditor extends StatefulWidget {
   final String initMode;
@@ -132,29 +132,7 @@ class RelayConfigEditorState extends State<RelayConfigEditor> {
             ),
             Container(
                 height: 50,
-                child: CustomPaint(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: () {
-                        var hourTickPoint = <Widget>[];
-                        List.generate(12, (i) => (i + 1)).forEach((index) {
-                          var _hours = index * (24 / 12);
-                          hourTickPoint.add(Expanded(
-                            child: Text(
-                              "${_hours < 10 ? 0 : ""}${_hours.toInt()}",
-                              textAlign: TextAlign.right,
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 10),
-                            ),
-                          ));
-                        });
-                        return hourTickPoint;
-                      }()),
-                  painter: ScheduleDrawer(
-                      hourTickCount: 12,
-                      schedule: _scheduleEditorVal["schedules"]),
-                )),
+                child: ScheduleTimeline(schedule: _scheduleEditorVal["schedules"],)),
             Row(
               children: <Widget>[
                 Text("Repeat: "),
